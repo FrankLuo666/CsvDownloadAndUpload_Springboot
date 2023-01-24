@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>testPageView</title>
+</head>
+<body>
+test downlaod csv. <br>
+<button id="btn">Download CSV</button>
+</body>
+
+<!--import jQuery-->
+<script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#btn").click(function(){
+            //方法一, get请求，调apache的common CSV作成CSV；
+            // $.ajax({
+            //     type: "GET",
+            //     url: "/downloadCSV",
+            //     success: function(data) {
+            //         var blob = new Blob([data], { type: 'text/csv;charset=utf-8;' });
+            //         //如果需要支持IE浏览器，需要下面这个判断；否则就不用了。
+            //         if (navigator.msSaveBlob) {
+            //             navigator.msSaveBlob(blob, "YourFileName.csv");
+            //         } else {
+            //             var link = document.createElement("a");
+            //             if (link.download !== undefined) {
+            //                 var url = URL.createObjectURL(blob);
+            //                 link.setAttribute("href", url);
+            //                 link.setAttribute("download", "YourFileName.csv");
+            //                 document.body.appendChild(link);
+            //                 link.click();
+            //                 document.body.removeChild(link);
+            //             }
+            //         }
+            //     }
+            // });
+
+            //方法二；get方式发送请求, 将文件名和csv内容放到一个对象里返回；
+            // $.ajax({
+            //     type: "GET",
+            //     url: "your_backend_url",
+            //     success: function(response) {
+            //         var fileName = response.fileName;
+            //         var csvContent = response.content;
+            //         // 使用JavaScript下载文件
+            //         var a = document.createElement("a");
+            //         document.body.appendChild(a);
+            //         a.style = "display: none";
+            //         var blob = new Blob([csvContent], {type: "octet/stream"}),
+            //             url = window.URL.createObjectURL(blob);
+            //         a.href = url;
+            //         a.download = fileName;
+            //         a.click();
+            //         window.URL.revokeObjectURL(url);
+            //     }
+            // });
+
+            //方法3，发送post请求，发送一个对象到后台并返回csv对象
+            var myData = {name: "John", price: "123", number: 30};
+            $.ajax({
+                type: "POST",
+                contentType: "application/json",
+                url: "downloadCsvByPost",
+                data: JSON.stringify(myData),
+                dataType: "json",
+                success: function(response) {
+                    var fileName = response.fileName;
+                    var csvContent = response.content;
+                    // 使用JavaScript下载文件
+                    var a = document.createElement("a");
+                    document.body.appendChild(a);
+                    a.style = "display: none";
+                    var blob = new Blob([csvContent], {type: "octet/stream"}),
+                        url = window.URL.createObjectURL(blob);
+                    a.href = url;
+                    a.download = fileName;
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                },
+                error: function(xhr, status, error) {
+                    console.log("error");
+                }
+            });
+
+
+        });
+    });
+</script>
+</html>
